@@ -87,16 +87,20 @@ public class TableExcelElementHandler implements ExcelElementHandler {
     private void resolveBorderForMergedCells(CellRangeAddress cellRangeAddress,
                                              XSSFCellStyle xssfCellStyle,
                                              XSSFSheet sheet) {
+        
         setBorderBottom(xssfCellStyle.getBorderBottom(), cellRangeAddress, sheet);
         setBorderRight(xssfCellStyle.getBorderRight(), cellRangeAddress, sheet);
-    }
 
-    private int convertByteArrayToInt(byte[] bytes) {
-        int value = 0;
-        for (byte b : bytes) {
-            value = (value << 8) + (b & 0xFF);
+        XSSFRow lastRow = sheet.getRow(cellRangeAddress.getLastRow());
+        for (int i = cellRangeAddress.getFirstColumn(); i < cellRangeAddress.getLastColumn() + 1; i++) {
+            XSSFCell xssfCell = lastRow.getCell(i);
+            xssfCell.setCellStyle(xssfCellStyle);
         }
-        return value;
-    }
 
+        for (int i = cellRangeAddress.getFirstRow(); i < cellRangeAddress.getLastRow() + 1; i++) {
+            XSSFCell xssfCell = sheet.getRow(i).getCell(cellRangeAddress.getLastColumn());
+            xssfCell.setCellStyle(xssfCellStyle);
+        }
+
+    }
 }
