@@ -62,43 +62,41 @@ public class ExportTablesSheetTest {
         data.put("Sheet 3 - Test", getData());
         data.put("Sheet 4 - Test", getData());
 
-
+        final long start = System.nanoTime();
         ExcelFileGenerator.generate(data, css, newOutputStream(of(exportPath)));
+        final long stop = System.nanoTime();
+        System.out.println((stop - start) / 1000 / 1000 / 1000);
     }
 
     private static List<Object> getData() {
 
-        Table table = new Table();
+        final Table table = new Table();
 
-        Cell year = new Cell().setData("Year").setColSpan(4).setCssClass("bleuFonce");
-        Cell empty = new Cell().setData("I am an Empty Cell").setRowSpan(2).setColSpan(2).setCssClass("bleuFonce");
+        final Cell year = new Cell().setData("Year").setColSpan(4).setCssClass("bleuFonce");
+        final Cell empty = new Cell().setData("I am an Empty Cell").setRowSpan(2).setColSpan(2).setCssClass("bleuFonce");
 
-        Cell y1 = new Cell().setData("2020").setCssClass("bleuClaire");
-        Cell y2 = new Cell().setData("2021").setCssClass("bleuClaire");
-        Cell y3 = new Cell().setData("2022").setCssClass("bleuClaire");
-        Cell y4 = new Cell().setData("2023").setCssClass("bleuClaire");
+        final Cell y1 = new Cell().setData("2020").setCssClass("bleuClaire");
+        final Cell y2 = new Cell().setData("2021").setCssClass("bleuClaire");
+        final Cell y3 = new Cell().setData("2022").setCssClass("bleuClaire");
+        final Cell y4 = new Cell().setData("2023").setCssClass("bleuClaire");
 
-        List<Row> headerRow = new LinkedList<>();
+        final List<Row> headerRow = new LinkedList<>();
         headerRow.add(new Row().setCells(asList(year, empty)));
         headerRow.add(new Row().setCells(asList(y1, y2, y3, y4)));
 
-        List<Row> body = IntStream.range(0, 50)
+        final List<Row> body = IntStream.range(0, 10_000)
                 .mapToObj(i -> {
                     Random random = new Random();
-                    Cell data1 = new Cell().setData(random.nextLong(10000));
-                    Cell data2 = new Cell().setData(random.nextLong(10000));
-                    Cell data3 = new Cell().setData(random.nextLong(10000));
-                    Cell data4 = new Cell().setData(random.nextLong(10000));
-                    Cell data5 = new Cell().setData(random.nextLong(10000)).setColSpan(2);
-                    return new Row().setCells(asList(data1, data2, data3, data4, data5));
+                    Cell data1 = new Cell().setData(100000);
+                    return new Row().setCells(asList(data1, data1, data1, data1, data1));
                 }).toList();
 
-        List<Row> footerRow = new LinkedList<>();
-        Cell t1 = new Cell().setData("2020").setCssClass("");
-        Cell t2 = new Cell().setData("2021").setCssClass("");
-        Cell t3 = new Cell().setData("2022").setCssClass("");
-        Cell t4 = new Cell().setData("2023").setCssClass("");
-        Cell t5 = new Cell().setData("Total").setCssClass("").setColSpan(2);
+        final List<Row> footerRow = new LinkedList<>();
+        final Cell t1 = new Cell().setData("2020").setCssClass("");
+        final Cell t2 = new Cell().setData("2021").setCssClass("");
+        final Cell t3 = new Cell().setData("2022").setCssClass("");
+        final Cell t4 = new Cell().setData("2023").setCssClass("");
+        final Cell t5 = new Cell().setData("Total").setCssClass("").setColSpan(2);
         footerRow.add(new Row().setCells(asList(t1, t2, t3, t4, t5)));
 
         table.setHeader(headerRow);

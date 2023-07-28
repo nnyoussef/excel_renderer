@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ExcelFileGenerator {
@@ -25,16 +25,16 @@ public class ExcelFileGenerator {
     public static XSSFWorkbook generate(Map<String, List<Object>> rendereableObjectsPerSheet,
                                         String css,
                                         OutputStream outputStream) {
+        ConcurrentHashMap<String, XSSFSheet> xssfSheetConcurrentHashMap = new ConcurrentHashMap<>();
 
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
 
             final StyleContext styleContext = StyleContext.init(css, workbook);
-            AtomicReference<XSSFSheet> currentWorkSheetInProgress = new AtomicReference<>();
 
             rendereableObjectsPerSheet.entrySet().stream()
-                    .peek(stringListEntry -> currentWorkSheetInProgress.set(workbook.createSheet(stringListEntry.getKey())))
+                    .peek(stringListEntry -> xssfSheetConcurrentHashMap.put(stringListEntry.getKey(), workbook.createSheet(stringListEntry.getKey())))
                     .forEach(stringListEntry -> {
-                        XSSFSheet xssfSheet = currentWorkSheetInProgress.get();
+                        XSSFSheet xssfSheet = xssfSheetConcurrentHashMap.get(stringListEntry.getKey());
                         CoordinateDto coordinateDto = new CoordinateDto();
                         stringListEntry.getValue()
                                 .forEach(o -> {

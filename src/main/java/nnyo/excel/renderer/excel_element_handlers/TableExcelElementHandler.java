@@ -87,7 +87,9 @@ public class TableExcelElementHandler implements ExcelElementHandler {
     private void resolveBorderForMergedCells(CellRangeAddress cellRangeAddress,
                                              XSSFCellStyle xssfCellStyle,
                                              XSSFSheet sheet) {
-        
+        if (cellRangeAddress.getNumberOfCells() == 1)
+            return;
+
         setBorderBottom(xssfCellStyle.getBorderBottom(), cellRangeAddress, sheet);
         setBorderRight(xssfCellStyle.getBorderRight(), cellRangeAddress, sheet);
 
