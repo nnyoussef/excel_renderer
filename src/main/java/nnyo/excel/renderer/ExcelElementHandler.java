@@ -8,5 +8,5 @@ public interface ExcelElementHandler {
     void handle(CoordinateDto coordinateDto,
                 Object elementToHandle,
                 XSSFSheet worksheet,
-                StyleContext styleContext);
+                CellStyleProcessor cellStyleProcessor);
 }

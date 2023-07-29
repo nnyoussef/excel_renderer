@@ -2,7 +2,7 @@ package nnyo.excel.renderer.excel_element_handlers;
 
 
 import nnyo.excel.renderer.ExcelElementHandler;
-import nnyo.excel.renderer.StyleContext;
+import nnyo.excel.renderer.CellStyleProcessor;
 import nnyo.excel.renderer.dto.CoordinateDto;
 import nnyo.excel.renderer.excel_element.Row;
 import nnyo.excel.renderer.excel_element.Table;
@@ -28,13 +28,13 @@ public class TableExcelElementHandler implements ExcelElementHandler {
     public void handle(CoordinateDto coordinateDto,
                        Object elementToHandle,
                        XSSFSheet worksheet,
-                       StyleContext styleContext) {
+                       CellStyleProcessor cellStyleProcessor) {
 
         Table table = ((Table) elementToHandle);
 
-        renderTableType1(worksheet, table.getHeader(), coordinateDto, "thead", styleContext);
-        renderTableType1(worksheet, table.getBody(), coordinateDto, "tbody", styleContext);
-        renderTableType1(worksheet, table.getFooter(), coordinateDto, "tfoot", styleContext);
+        renderTableType1(worksheet, table.getHeader(), coordinateDto, "thead", cellStyleProcessor);
+        renderTableType1(worksheet, table.getBody(), coordinateDto, "tbody", cellStyleProcessor);
+        renderTableType1(worksheet, table.getFooter(), coordinateDto, "tfoot", cellStyleProcessor);
 
         coordinateDto.setCellPosition(1);
         coordinateDto.incrementPosition(1, 0);
@@ -44,7 +44,7 @@ public class TableExcelElementHandler implements ExcelElementHandler {
                                   Collection<Row> header,
                                   CoordinateDto coordinateDto,
                                   String tableSection,
-                                  StyleContext styleContext) {
+                                  CellStyleProcessor cellStyleProcessor) {
         header.forEach(row -> {
             row.getCells()
                     .forEach(cell -> {
@@ -60,7 +60,7 @@ public class TableExcelElementHandler implements ExcelElementHandler {
 
                         XSSFRow xssfRow = getRow(worksheet, coordinateDto);
                         XSSFCell xssfCell = xssfRow.createCell(coordinateDto.getCellPosition());
-                        XSSFCellStyle xssfCellStyle = styleContext.createStyle(css);
+                        XSSFCellStyle xssfCellStyle = cellStyleProcessor.createStyle(css);
 
                         CellRangeAddress cellRangeAddress = createSpan(worksheet, rowSpan, colSpan, coordinateDto);
 

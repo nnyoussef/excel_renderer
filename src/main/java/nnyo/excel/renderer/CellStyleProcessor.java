@@ -35,7 +35,7 @@ import static org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT;
 import static org.apache.poi.ss.usermodel.HorizontalAlignment.RIGHT;
 import static org.apache.poi.ss.usermodel.VerticalAlignment.CENTER;
 
-public class StyleContext {
+public class CellStyleProcessor {
 
     private final Map<String, XSSFCellStyle> cacheCellStyle = new HashMap<>(30);
 
@@ -44,8 +44,8 @@ public class StyleContext {
     private Map<String, Map<String, String>> cssRuleDeclaration = new HashMap<>(30);
 
     //-------------------------- Init One Time - Public Usage -------------------------------------------------
-    public static StyleContext init(String css,
-                                    XSSFWorkbook xssfWorkbook) throws IOException {
+    public static CellStyleProcessor init(String css,
+                                          XSSFWorkbook xssfWorkbook) throws IOException {
 
         Map<String, Map<String, String>> cssRuleDeclaration = new HashMap<>(30);
 
@@ -73,15 +73,15 @@ public class StyleContext {
                 cssRuleDeclaration.get(ruleName).put(propName, propertyValue.trim().strip());
             }
         }
-        StyleContext styleContext = new StyleContext();
-        styleContext.cssRuleDeclaration = cssRuleDeclaration;
-        styleContext.xssfWorkbook = xssfWorkbook;
-        return styleContext;
+        CellStyleProcessor cellStyleProcessor = new CellStyleProcessor();
+        cellStyleProcessor.cssRuleDeclaration = cssRuleDeclaration;
+        cellStyleProcessor.xssfWorkbook = xssfWorkbook;
+        return cellStyleProcessor;
     }
 
     //-------------------------- Public Usage -------------------------------------------------
 
-    private StyleContext() {
+    private CellStyleProcessor() {
     }
 
     public XSSFCellStyle createStyle(String css) {

@@ -29,7 +29,7 @@ public class ExcelFileGenerator {
 
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
 
-            final StyleContext styleContext = StyleContext.init(css, workbook);
+            final CellStyleProcessor cellStyleProcessor = CellStyleProcessor.init(css, workbook);
 
             rendereableObjectsPerSheet.entrySet().stream()
                     .peek(stringListEntry -> xssfSheetConcurrentHashMap.put(stringListEntry.getKey(), workbook.createSheet(stringListEntry.getKey())))
@@ -39,7 +39,7 @@ public class ExcelFileGenerator {
                         stringListEntry.getValue()
                                 .forEach(o -> {
                                     if (o instanceof Table) {
-                                        STRATEGIES_MAP.get(Table.class).handle(coordinateDto, o, xssfSheet, styleContext);
+                                        STRATEGIES_MAP.get(Table.class).handle(coordinateDto, o, xssfSheet, cellStyleProcessor);
                                     }
 
                                 });
