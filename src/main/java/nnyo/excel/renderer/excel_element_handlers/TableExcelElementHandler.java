@@ -1,8 +1,8 @@
 package nnyo.excel.renderer.excel_element_handlers;
 
 
-import nnyo.excel.renderer.ExcelElementHandler;
 import nnyo.excel.renderer.CellStyleProcessor;
+import nnyo.excel.renderer.ExcelElementHandler;
 import nnyo.excel.renderer.dto.CoordinateDto;
 import nnyo.excel.renderer.excel_element.Row;
 import nnyo.excel.renderer.excel_element.Table;
@@ -14,6 +14,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.ofNullable;
 import static nnyo.excel.renderer.utils.CellDataUtils.setData;
@@ -45,6 +47,10 @@ public class TableExcelElementHandler implements ExcelElementHandler {
                                   CoordinateDto coordinateDto,
                                   String tableSection,
                                   CellStyleProcessor cellStyleProcessor) {
+
+        final AtomicBoolean isThereAnyMergeInProgress = new AtomicBoolean(false);
+        final AtomicInteger deepestRowSpanPosition = new AtomicInteger(coordinateDto.getRowPosition());
+
         header.forEach(row -> {
             row.getCells()
                     .forEach(cell -> {
@@ -55,22 +61,28 @@ public class TableExcelElementHandler implements ExcelElementHandler {
                                 .map(c -> String.format("%s .%s", tableSection, c))
                                 .orElse(String.format("%s .default", tableSection));
 
-                        int closestUnmergedCellIndex = findClosestUnmergedCellOfRow(worksheet, coordinateDto);
-                        coordinateDto.setCellPosition(closestUnmergedCellIndex);
+                        if (isThereAnyMergeInProgress.get())
+                            coordinateDto.setCellPosition(findClosestUnmergedCellOfRow(worksheet, coordinateDto));
 
                         XSSFRow xssfRow = getRow(worksheet, coordinateDto);
                         XSSFCell xssfCell = xssfRow.createCell(coordinateDto.getCellPosition());
                         XSSFCellStyle xssfCellStyle = cellStyleProcessor.createStyle(css);
 
-                        CellRangeAddress cellRangeAddress = createSpan(worksheet, rowSpan, colSpan, coordinateDto);
+                        CellRangeAddress cellAddressesAfterMerging = createSpan(worksheet, rowSpan, colSpan, coordinateDto);
 
                         coordinateDto.incrementPosition(0, colSpan);
 
                         setData(cell.getData(), xssfCell);
-                        resolveBorderForMergedCells(cellRangeAddress, xssfCellStyle, worksheet);
+                        resolveBorderForMergedCells(cellAddressesAfterMerging, xssfCellStyle, worksheet);
                         xssfCell.setCellStyle(xssfCellStyle);
 
+                        if (deepestRowSpanPosition.get() < cellAddressesAfterMerging.getLastRow()) {
+                            deepestRowSpanPosition.set(cellAddressesAfterMerging.getLastRow());
+                        }
+
+
                     });
+            isThereAnyMergeInProgress.set(deepestRowSpanPosition.get() > coordinateDto.getRowPosition());
             coordinateDto.setCellPosition(1); // each row iteration the cell cursor should be back to 1
             coordinateDto.incrementPosition(1, 0); // tracing the position of the current row
         });

@@ -65,7 +65,7 @@ public class ExportTablesSheetTest {
         final long start = System.nanoTime();
         ExcelFileGenerator.generate(data, css, newOutputStream(of(exportPath)));
         final long stop = System.nanoTime();
-        System.out.println((stop - start) / 1000 / 1000 / 1000);
+        System.out.println(((stop - start) / 1000 / 1000 / 1000));
     }
 
     private static List<Object> getData() {
@@ -84,11 +84,11 @@ public class ExportTablesSheetTest {
         headerRow.add(new Row().setCells(asList(year, empty)));
         headerRow.add(new Row().setCells(asList(y1, y2, y3, y4)));
 
-        final List<Row> body = IntStream.range(0, 10_000)
+        final List<Row> body = IntStream.range(0, 1_000)
                 .mapToObj(i -> {
-                    Random random = new Random();
                     Cell data1 = new Cell().setData(100000);
-                    return new Row().setCells(asList(data1, data1, data1, data1, data1));
+                    Cell data2 = new Cell().setData(100000).setColSpan(2);
+                    return new Row().setCells(asList(data1, data1, data1, data1, data2));
                 }).toList();
 
         final List<Row> footerRow = new LinkedList<>();
